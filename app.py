@@ -127,6 +127,10 @@ UI_CSS = """
 
     /* Hide redundant Streamlit UI */
     #MainMenu, footer, header, .stDeployButton { visibility: hidden; display: none !important; }
+
+    /* Hide sidebar close button */
+    button[kind="secondary"] svg { display: none; }
+    .stSidebarCollapsedControl { display: none !important; }
 </style>
 """
 
