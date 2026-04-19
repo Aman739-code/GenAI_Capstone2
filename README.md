@@ -1,4 +1,4 @@
-# 🌞 Intelligent Solar Energy Forecasting & Agentic Grid Optimization
+# Intelligent Solar Energy Forecasting & Agentic Grid Optimization
 
 An autonomous grid management assistant that evolves a Milestone 1 ML forecasting model into a multi-node LangGraph agentic workflow with RAG-grounded decision-making and structured report generation.
 
@@ -9,7 +9,7 @@ An autonomous grid management assistant that evolves a Milestone 1 ML forecastin
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -57,7 +57,7 @@ AgentState (TypedDict)
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 milestone2/
@@ -98,7 +98,7 @@ milestone2/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -148,7 +148,7 @@ The app opens at `http://localhost:8501`. Use the sidebar to configure parameter
 
 ---
 
-## 🔑 API Key Setup
+## API Key Setup
 
 | Provider | Model | Setup | Cost |
 |----------|-------|-------|------|
@@ -163,7 +163,7 @@ The app opens at `http://localhost:8501`. Use the sidebar to configure parameter
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
 ### Hugging Face Spaces
 
@@ -182,7 +182,7 @@ The app opens at `http://localhost:8501`. Use the sidebar to configure parameter
 
 ---
 
-## 📊 Features
+## Features
 
 ### Multi-Node LangGraph Pipeline
 - **Analysis Node**: Statistical computation (CoV, ramp rates) + LLM-powered insights
@@ -212,7 +212,7 @@ The app opens at `http://localhost:8501`. Use the sidebar to configure parameter
 
 ---
 
-## 🧪 Testing
+## Testing
 
 See [Testing_Guide.md](./Testing_Guide.md) for a comprehensive testing checklist covering:
 - LangGraph state flow verification
@@ -222,6 +222,6 @@ See [Testing_Guide.md](./Testing_Guide.md) for a comprehensive testing checklist
 
 ---
 
-## 📜 License
+## License
 
 This project is developed for educational and internship evaluation purposes.
