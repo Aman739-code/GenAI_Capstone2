@@ -41,7 +41,7 @@ def _generate_synthetic_solar_data(days: int = 90) -> pd.DataFrame:
         cloud_base = 0.3 + 0.2 * np.sin(2 * np.pi * day_of_year / 365)
         cloud_cover = np.clip(cloud_base + rng.normal(0, 0.2), 0, 1)
 
-        # GHI (Global Horizontal Irradiance) in W/m²
+        # GHI (Global Horizontal Irradiance) in W/m^2
         clear_sky_ghi = 1000 * solar_angle * seasonal_mod
         ghi = clear_sky_ghi * (1 - 0.75 * cloud_cover) + rng.normal(0, 15)
         ghi = max(0, ghi)

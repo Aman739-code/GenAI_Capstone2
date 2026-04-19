@@ -39,10 +39,12 @@ TOP_K_RETRIEVAL = 4
 MAX_ITERATIONS = 10
 NODE_TIMEOUT_SECONDS = 120
 
+from typing import Optional
+
 # ──────────────────────────────────────────────
 # API Key Handling
 # ──────────────────────────────────────────────
-def get_api_key() -> str | None:
+def get_api_key() -> Optional[str]:
     """
     Retrieve the Google API key from multiple sources.
     Priority: Streamlit secrets > Environment variable > None

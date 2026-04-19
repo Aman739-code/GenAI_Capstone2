@@ -2,18 +2,15 @@
 Utility helper functions for the Solar Grid Optimization Agent.
 """
 
-from __future__ import annotations
-
-import json
-from datetime import datetime
+from typing import Any, Optional, Union
 
 
-def format_timestamp(dt: datetime | None = None) -> str:
+def format_timestamp(dt: Optional[datetime] = None) -> str:
     """Format a datetime as ISO string."""
     return (dt or datetime.now()).isoformat()
 
 
-def safe_json_loads(text: str, default: dict | list | None = None) -> dict | list:
+def safe_json_loads(text: str, default: Optional[Union[dict, list]] = None) -> Union[dict, list]:
     """Safely parse JSON with fallback."""
     try:
         # Try direct parse
@@ -36,7 +33,7 @@ def truncate_text(text: str, max_length: int = 500) -> str:
     return text[: max_length - 3] + "..."
 
 
-def format_report_section(title: str, content: str | dict | list) -> str:
+def format_report_section(title: str, content: Union[str, dict, list]) -> str:
     """Format a report section for display."""
     if isinstance(content, dict):
         content = json.dumps(content, indent=2, default=str)

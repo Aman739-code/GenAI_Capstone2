@@ -16,6 +16,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import textwrap
 
 # ─── Ensure project root is on path ───
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -36,201 +37,139 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ─── Custom CSS ───
-st.markdown("""
+# ─── Design System & CSS ───
+UI_CSS = """
 <style>
-    /* Import Google Font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    /* Premium Font & Global Root */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
-    /* Global styles */
     .stApp {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Outfit', 'Inter', sans-serif;
+        background-color: #05070A;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(247, 201, 72, 0.05) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(255, 107, 53, 0.05) 0px, transparent 50%);
+        color: #E2E8F0;
     }
 
-    /* Hero header */
-    .hero-header {
-        background: linear-gradient(135deg, #FF6B35 0%, #F7C948 50%, #FF8C42 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0;
-        line-height: 1.2;
-    }
-
-    .hero-subtitle {
-        color: #8B95A5;
-        font-size: 1.1rem;
-        font-weight: 300;
-        margin-top: 0;
-    }
-
-    /* Card styling */
+    /* Glass Effect Utility */
     .glass-card {
-        background: rgba(26, 29, 41, 0.8);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 107, 53, 0.15);
+        background: rgba(17, 21, 30, 0.6);
+        backdrop-filter: blur(25px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 16px;
         padding: 1.5rem;
-        margin-bottom: 1rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .glass-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(255, 107, 53, 0.15);
-    }
-
-    /* Metric cards */
-    .metric-card {
-        background: linear-gradient(135deg, rgba(26, 29, 41, 0.9) 0%, rgba(30, 35, 50, 0.9) 100%);
-        border: 1px solid rgba(255, 107, 53, 0.2);
-        border-radius: 12px;
-        padding: 1.25rem;
-        text-align: center;
-    }
-
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #FF6B35, #F7C948);
+    /* Sidebar Logo */
+    .sidebar-logo {
+        font-size: 1.6rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #F7C948 0%, #FF6B35 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-clip: text;
+        margin-bottom: 2rem;
     }
 
-    .metric-label {
-        color: #8B95A5;
-        font-size: 0.85rem;
-        font-weight: 500;
+    /* KPI Cards (Restored Horizontal Look) */
+    .kpi-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    .kpi-card:hover {
+        border-color: rgba(255, 107, 53, 0.4);
+        background: rgba(255, 255, 255, 0.04);
+    }
+    .kpi-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        line-height: 1.2;
+    }
+    .kpi-label {
+        color: #94A3B8;
+        font-size: 0.75rem;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
         margin-top: 0.25rem;
     }
 
-    /* Risk badges */
-    .risk-low { color: #4CAF50; border-color: #4CAF50; }
-    .risk-medium { color: #FF9800; border-color: #FF9800; }
-    .risk-high { color: #F44336; border-color: #F44336; }
-    .risk-critical { color: #D32F2F; border-color: #D32F2F; background: rgba(211,47,47,0.1); }
+    /* Modern Tabs Restoration */
+    .stTabs [data-baseweb="tab-list"] { gap: 2rem; }
+    .stTabs [data-baseweb="tab"] { font-weight: 600; color: #64748B; }
+    .stTabs [aria-selected="true"] { color: #FF6B35 !important; }
 
-    .risk-badge {
-        display: inline-block;
-        padding: 0.35rem 1rem;
-        border-radius: 20px;
-        border: 2px solid;
-        font-weight: 600;
-        font-size: 0.9rem;
-        letter-spacing: 0.05em;
+    /* Terminal/Reasoning */
+    .terminal-box {
+        font-family: 'JetBrains Mono', monospace;
+        background: #020408;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.85rem;
+        color: #CBD5E0;
     }
 
-    /* Pipeline status */
-    .node-status {
-        display: inline-flex;
+    /* Custom Headers */
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin-bottom: 1.25rem;
+        display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        margin: 0.25rem;
-        font-size: 0.85rem;
-        font-weight: 500;
     }
 
-    .node-active {
-        background: rgba(255, 107, 53, 0.15);
-        border: 1px solid rgba(255, 107, 53, 0.4);
-        color: #FF6B35;
-    }
-
-    .node-complete {
-        background: rgba(76, 175, 80, 0.15);
-        border: 1px solid rgba(76, 175, 80, 0.4);
-        color: #4CAF50;
-    }
-
-    .node-pending {
-        background: rgba(139, 149, 165, 0.1);
-        border: 1px solid rgba(139, 149, 165, 0.2);
-        color: #8B95A5;
-    }
-
-    /* Section headers */
-    .section-header {
-        color: #FF6B35;
-        font-weight: 600;
-        font-size: 1.3rem;
-        border-bottom: 2px solid rgba(255, 107, 53, 0.3);
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    /* Storage action badges */
-    .action-charge { background: linear-gradient(135deg, #4CAF50, #66BB6A); }
-    .action-discharge { background: linear-gradient(135deg, #FF6B35, #FF8C42); }
-    .action-hold { background: linear-gradient(135deg, #607D8B, #78909C); }
-
-    .action-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        color: white;
-        font-weight: 600;
-        font-size: 0.8rem;
-    }
-
-    /* Divider */
-    .custom-divider {
-        border: none;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.3), transparent);
-        margin: 1.5rem 0;
-    }
-
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-
-    /* Tab styling */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
-        padding: 8px 20px;
-    }
+    /* Hide redundant Streamlit UI */
+    #MainMenu, footer, header, .stDeployButton { visibility: hidden; display: none !important; }
 </style>
-""", unsafe_allow_html=True)
+"""
 
+st.markdown(UI_CSS, unsafe_allow_html=True)
 
 # ─── Helper Functions ───
 
-def render_risk_badge(level: str) -> str:
-    """Render a styled risk level badge."""
-    css_class = f"risk-{level.lower()}" if level else "risk-medium"
-    return f'<span class="risk-badge {css_class}">{level}</span>'
-
-
-def render_metric_card(value: str, label: str) -> str:
-    """Render a styled KPI metric card."""
+def render_kpi(value: str, label: str) -> str:
+    """Render a compact horizontal KPI card."""
     return f"""
-    <div class="metric-card">
-        <div class="metric-value">{value}</div>
-        <div class="metric-label">{label}</div>
+    <div class="kpi-card">
+        <div class="kpi-value">{value}</div>
+        <div class="kpi-label">{label}</div>
     </div>
     """
 
 
+def render_risk_badge(level: str) -> str:
+    """Render a clean risk status label."""
+    lvl = level.upper() if level else "MEDIUM"
+    colors = {
+        "LOW": "#00C853",
+        "MEDIUM": "#FFA726",
+        "HIGH": "#FF1744",
+        "CRITICAL": "#FF5251"
+    }
+    color = colors.get(lvl, "#FFA726")
+    return f'<span style="color: {color};">{lvl}</span>'
+
+
 def render_node_status(name: str, status: str) -> str:
     """Render a pipeline node status badge."""
-    icons = {"complete": "✅", "active": "⚡", "pending": "⏳", "error": "❌"}
-    icon = icons.get(status, "⏳")
-    return f'<span class="node-status node-{status}">{icon} {name}</span>'
+    if status == "active":
+        return f'<div style="color:#FF6B35; font-weight:700;">● {name}</div>'
+    elif status == "complete":
+        return f'<div style="color:#00C853;">✓ {name}</div>'
+    else:
+        return f'<div style="color:#4A5568;">○ {name}</div>'
+
 
 
 def create_forecast_chart(forecast_data: dict) -> go.Figure:
-    """Create an interactive forecast power output chart."""
+    """Create a premium interactive forecast power output chart."""
     predictions = forecast_data.get("hourly_predictions", [])
     features = forecast_data.get("raw_features", {})
     timestamps = features.get("timestamps", list(range(len(predictions))))
@@ -242,100 +181,69 @@ def create_forecast_chart(forecast_data: dict) -> go.Figure:
 
     fig = go.Figure()
 
-    # Power output area chart
+    # Main Area Trace
     fig.add_trace(go.Scatter(
         x=df["Timestamp"],
         y=df["Power Output (kW)"],
         fill="tozeroy",
-        fillcolor="rgba(255, 107, 53, 0.15)",
-        line=dict(color="#FF6B35", width=2),
-        name="Predicted Power",
-        hovertemplate="<b>%{x}</b><br>Power: %{y:.2f} kW<extra></extra>",
+        fillcolor="rgba(255, 107, 53, 0.1)",
+        line=dict(color="#FF6B35", width=3, shape="spline"),
+        name="Solar Forecast",
+        hovertemplate="<b>%{x}</b><br>Generation: %{y:.2f} kW<extra></extra>",
     ))
 
-    # Add cloud cover as secondary axis if available
+    # Cloud Cover Trace
     if "cloud_cover" in features:
-        cloud = features["cloud_cover"]
         fig.add_trace(go.Scatter(
             x=df["Timestamp"],
-            y=[c * 100 for c in cloud],
-            line=dict(color="#8B95A5", width=1, dash="dot"),
-            name="Cloud Cover (%)",
+            y=[c * 100 for c in features["cloud_cover"]],
+            line=dict(color="rgba(113, 128, 150, 0.4)", width=1, dash="dot"),
+            name="Cloud Density",
             yaxis="y2",
-            hovertemplate="Cloud: %{y:.0f}%<extra></extra>",
+            hovertemplate="Cloud: %{y:.1f}%<extra></extra>",
         ))
 
     fig.update_layout(
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        height=400,
-        margin=dict(l=0, r=0, t=30, b=0),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
-        ),
-        xaxis=dict(
-            showgrid=True,
-            gridcolor="rgba(255,255,255,0.05)",
-            title="",
-        ),
-        yaxis=dict(
-            showgrid=True,
-            gridcolor="rgba(255,255,255,0.05)",
-            title="Power Output (kW)",
-            title_font=dict(color="#FF6B35"),
-        ),
-        yaxis2=dict(
-            title="Cloud Cover (%)",
-            title_font=dict(color="#8B95A5"),
-            overlaying="y",
-            side="right",
-            showgrid=False,
-            range=[0, 100],
-        ),
+        height=450,
+        margin=dict(l=0, r=0, t=20, b=0),
+        xaxis=dict(showgrid=False, zeroline=False),
+        yaxis=dict(gridcolor="rgba(255,255,255,0.05)", zeroline=False),
+        yaxis2=dict(overlaying="y", side="right", range=[0, 100], showgrid=False),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         hovermode="x unified",
+        font=dict(family="Inter", size=11, color="#718096"),
     )
 
     return fig
 
 
 def create_daily_chart(daily_summaries: list) -> go.Figure:
-    """Create a daily generation summary bar chart."""
-    if not daily_summaries:
-        return go.Figure()
-
+    """Create a minimalist daily generation summary chart."""
+    if not daily_summaries: return go.Figure()
     df = pd.DataFrame(daily_summaries)
 
-    fig = go.Figure()
-
-    fig.add_trace(go.Bar(
+    fig = go.Figure(go.Bar(
         x=df["date"],
         y=df["total_generation_kwh"],
         marker=dict(
             color=df["total_generation_kwh"],
-            colorscale=[[0, "#F44336"], [0.5, "#FF9800"], [1, "#4CAF50"]],
+            colorscale=[[0, "#FF6B35"], [1, "#F7C948"]],
             line=dict(width=0),
         ),
-        name="Daily Generation",
-        hovertemplate="<b>%{x}</b><br>Generation: %{y:.1f} kWh<extra></extra>",
+        hovertemplate="<b>%{x}</b><br>Total: %{y:.1f} kWh<extra></extra>",
     ))
 
     fig.update_layout(
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        height=300,
+        height=320,
         margin=dict(l=0, r=0, t=10, b=0),
-        xaxis=dict(showgrid=False, title=""),
-        yaxis=dict(
-            showgrid=True,
-            gridcolor="rgba(255,255,255,0.05)",
-            title="Generation (kWh)",
-        ),
+        xaxis=dict(showgrid=False),
+        yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
         showlegend=False,
     )
 
@@ -343,21 +251,20 @@ def create_daily_chart(daily_summaries: list) -> go.Figure:
 
 
 def create_energy_allocation_chart(plan: dict) -> go.Figure:
-    """Create a donut chart for energy allocation."""
+    """Create a premium donut chart for energy allocation."""
     solar = plan.get("solar_allocation_percent", 65)
     grid = plan.get("grid_import_percent", 15)
     storage = plan.get("storage_usage_percent", 20)
 
     fig = go.Figure(go.Pie(
-        labels=["Solar", "Grid Import", "Storage"],
+        labels=["Solar", "Grid", "Storage"],
         values=[solar, grid, storage],
-        hole=0.55,
+        hole=0.7,
         marker=dict(
-            colors=["#FF6B35", "#3F51B5", "#4CAF50"],
-            line=dict(color="#0E1117", width=3),
+            colors=["#FF6B35", "#3F51B5", "#00C853"],
+            line=dict(color="#0B0E14", width=4),
         ),
-        textinfo="label+percent",
-        textfont=dict(size=13, color="white"),
+        textinfo="none",
         hovertemplate="<b>%{label}</b><br>%{value:.1f}%<extra></extra>",
     ))
 
@@ -366,32 +273,20 @@ def create_energy_allocation_chart(plan: dict) -> go.Figure:
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=300,
-        margin=dict(l=20, r=20, t=10, b=10),
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.1,
-            xanchor="center",
-            x=0.5,
-        ),
-        annotations=[dict(
-            text="Energy<br>Mix",
-            x=0.5, y=0.5,
-            font=dict(size=16, color="#8B95A5"),
-            showarrow=False,
-        )],
+        margin=dict(l=0, r=0, t=0, b=0),
+        legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.1),
+        annotations=[dict(text=f"Total<br>100%", x=0.5, y=0.5, font_size=16, showarrow=False, font_family="Outfit")],
     )
 
     return fig
 
 
+
 # ─── Sidebar ───
 
 with st.sidebar:
-    st.markdown('<p class="hero-header" style="font-size:1.5rem;">⚡ Control Panel</p>', unsafe_allow_html=True)
-    st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
-
+    st.markdown('<div class="sidebar-logo">SolarAgent.ai</div>', unsafe_allow_html=True)
+    
     # API Key
     st.markdown("#### 🔑 API Configuration")
     api_key_input = st.text_input(
@@ -458,12 +353,11 @@ with st.sidebar:
 
 # ─── Header ───
 
-st.markdown('<p class="hero-header">🌞 Solar Grid Optimization Agent</p>', unsafe_allow_html=True)
-st.markdown(
-    '<p class="hero-subtitle">Intelligent Solar Energy Forecasting & Agentic Grid Management</p>',
-    unsafe_allow_html=True,
-)
-st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
+# ─── Header ───
+st.title("🌞 Solar Grid Optimization Agent")
+st.markdown('<p style="color:#718096; font-size:1.1rem; margin-top:-1rem;">Intelligent Renewable Energy Forecasting & Grid Management</p>', unsafe_allow_html=True)
+st.markdown('<div style="height: 1px; background: rgba(255,255,255,0.05); margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
+
 
 
 # ─── Main Logic ───
@@ -555,351 +449,290 @@ if "pipeline_result" in st.session_state:
         storage_recs = report.get("storage_recommendations", [])
         util_plan = report.get("energy_utilization_plan", {})
 
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
+        st.markdown('<div style="height: 1rem;"></div>', unsafe_allow_html=True)
+        
+        m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+        with m_col1:
             peak = forecast_summary.get("peak_generation_kwh", 0)
-            st.markdown(render_metric_card(f"{peak:.1f} kW", "Peak Generation"), unsafe_allow_html=True)
-
-        with col2:
-            risk_level = risk_analysis.get("risk_level", result.get("risk_level", "N/A"))
-            st.markdown(render_metric_card(
-                render_risk_badge(risk_level), "Risk Level"
-            ), unsafe_allow_html=True)
-
-        with col3:
+            st.markdown(render_kpi(f"{peak:.1f} kW", "Peak Power"), unsafe_allow_html=True)
+        with m_col2:
+            risk_level = risk_analysis.get("risk_level", result.get("risk_level", "MEDIUM"))
+            st.markdown(render_kpi(render_risk_badge(risk_level), "Risk Profile"), unsafe_allow_html=True)
+        with m_col3:
             primary_action = storage_recs[0].get("action", "N/A") if storage_recs else "N/A"
-            st.markdown(render_metric_card(f"🔋 {primary_action}", "Storage Action"), unsafe_allow_html=True)
-
-        with col4:
+            st.markdown(render_kpi(f"🔋 {primary_action}", "Storage Mode"), unsafe_allow_html=True)
+        with m_col4:
             savings = util_plan.get("expected_cost_saving_percent", 0)
-            st.markdown(render_metric_card(f"{savings:.0f}%", "Est. Cost Savings"), unsafe_allow_html=True)
+            st.markdown(render_kpi(f"{savings:.0f}%", "Savings Est."), unsafe_allow_html=True)
 
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
+        st.markdown('<div style="height: 3rem;"></div>', unsafe_allow_html=True)
 
-        # Charts
-        col_left, col_right = st.columns([2, 1])
+        # Main Visualization Grid
+        g_col1, g_col2 = st.columns([2, 1])
 
-        with col_left:
-            st.markdown('<p class="section-header">⚡ Power Output Forecast</p>', unsafe_allow_html=True)
-            fig = create_forecast_chart(forecast_data)
-            st.plotly_chart(fig, use_container_width=True)
+        with g_col1:
+            st.markdown('<p class="section-header">Generation & Variability Forecast</p>', unsafe_allow_html=True)
+            with st.container(border=True):
+                st.plotly_chart(create_forecast_chart(forecast_data), use_container_width=True)
+            
+            st.markdown('<div style="height: 2rem;"></div>', unsafe_allow_html=True)
+            st.markdown('<p class="section-header">Weekly Cumulative Generation</p>', unsafe_allow_html=True)
+            with st.container(border=True):
+                st.plotly_chart(create_daily_chart(forecast_data.get("daily_summaries", [])), use_container_width=True)
 
-            st.markdown('<p class="section-header">📅 Daily Generation Summary</p>', unsafe_allow_html=True)
-            daily_fig = create_daily_chart(forecast_data.get("daily_summaries", []))
-            st.plotly_chart(daily_fig, use_container_width=True)
+        with g_col2:
+            st.markdown('<p class="section-header">Dynamic Energy Mix</p>', unsafe_allow_html=True)
+            with st.container(border=True):
+                st.plotly_chart(create_energy_allocation_chart(util_plan if isinstance(util_plan, dict) else {}), use_container_width=True)
+            
+            st.markdown('<p class="section-header">Model Assurance</p>', unsafe_allow_html=True)
+            with st.container(border=True):
+                m_data = forecast_data.get("model_metrics", {})
+                r2_val = f"{m_data.get('r2_score', 0):.4f}"
+                rmse_val = f"{m_data.get('rmse', 0):.4f}"
+                conf_val = f"{forecast_summary.get('confidence_level', 92.5):.1f}"
+                
+                st.markdown(textwrap.dedent(f"""
+                <div style="padding: 1rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+                        <span style="color:#94A3B8;">Accuracy (R-Squared)</span>
+                        <span style="color:#FFFFFF; font-weight:700;">{r2_val}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+                        <span style="color:#94A3B8;">RMSE Error</span>
+                        <span style="color:#FFFFFF; font-weight:700;">{rmse_val}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+                        <span style="color:#94A3B8;">Agent Confidence</span>
+                        <span style="color:#FF6B35; font-weight:700;">{conf_val}%</span>
+                    </div>
+                </div>
+                """), unsafe_allow_html=True)
 
-        with col_right:
-            st.markdown('<p class="section-header">🔄 Energy Allocation</p>', unsafe_allow_html=True)
-            alloc_fig = create_energy_allocation_chart(
-                util_plan if isinstance(util_plan, dict) else {}
-            )
-            st.plotly_chart(alloc_fig, use_container_width=True)
-
-            # Model Metrics
-            st.markdown('<p class="section-header">🎯 Model Performance</p>', unsafe_allow_html=True)
-            metrics = forecast_data.get("model_metrics", {})
-            mcol1, mcol2 = st.columns(2)
-            with mcol1:
-                st.metric("R² Score", f"{metrics.get('r2_score', 0):.4f}")
-                st.metric("RMSE", f"{metrics.get('rmse', 0):.4f}")
-            with mcol2:
-                st.metric("MAE", f"{metrics.get('mae', 0):.4f}")
-                confidence = forecast_summary.get("confidence_level", 0)
-                st.metric("Confidence", f"{confidence:.1f}%")
 
     # ═══════════════════════════════════════════
     # TAB 2: Agent Workflow
     # ═══════════════════════════════════════════
     with tab_workflow:
-        st.markdown('<p class="section-header">🔄 LangGraph Pipeline Execution</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-header">Agent Node Execution Monitor</p>', unsafe_allow_html=True)
 
-        # Pipeline visualization
+        # High-fidelity status row
         nodes = [
-            ("📊 Analysis", "complete"),
-            ("📚 RAG Retrieval", "complete"),
-            ("🧠 Planning", "complete"),
-            ("📝 Generation", "complete"),
+            ("Analysis", "complete"),
+            ("Retrieval", "complete"),
+            ("Planning", "complete"),
+            ("Generation", "complete")
         ]
+        
+        status_cols = st.columns(4)
+        for i, (name, status) in enumerate(nodes):
+            with status_cols[i]:
+                st.markdown(render_node_status(name, status), unsafe_allow_html=True)
 
-        errors = result.get("error_log", [])
-        if errors:
-            nodes.append(("⚠️ Warnings", "error"))
+        st.markdown('<div style="height: 2rem;"></div>', unsafe_allow_html=True)
 
-        node_html = " → ".join(render_node_status(name, status) for name, status in nodes)
-        st.markdown(f'<div style="text-align:center; padding: 1rem;">{node_html}</div>', unsafe_allow_html=True)
+        # Node-by-node outputs with terminal look
+        st.markdown('<p style="color:#A0AEC0; font-size: 0.9rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em;">Agent Logical Reasoning & Execution Logs</p>', unsafe_allow_html=True)
 
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
+        with st.expander("🔍 Analysis Node: Solar Pattern Recognition", expanded=True):
+            st.markdown(textwrap.dedent(f"""
+            <div class="terminal-container">
+                <span style="color:#FF6B35;">[SYSTEM]</span> Analyzing generational variance...<br>
+                <span style="color:#FF6B35;">[DATA]</span> CoV: {forecast_summary.get('variability_index', 0):.4f}<br>
+                <span style="color:#FF6B35;">[RISK]</span> Risk Level set to {result.get('risk_level', 'N/A')}<br><br>
+                {result.get('analysis_result', '')}
+            </div>
+            """), unsafe_allow_html=True)
 
-        # Node-by-node outputs
-        with st.expander("📊 Analysis Node Output", expanded=True):
-            st.markdown(result.get("analysis_result", "No analysis available."))
-            st.markdown("**Risk Level:** " + render_risk_badge(result.get("risk_level", "N/A")), unsafe_allow_html=True)
-            risk_factors = result.get("risk_factors", [])
-            if risk_factors:
-                st.markdown("**Risk Factors:**")
-                for rf in risk_factors:
-                    st.markdown(f"  - {rf}")
-
-        with st.expander("📚 RAG Retrieval Node Output"):
+        with st.expander("📚 RAG Node: Regulatory Retrieval"):
             guidelines = result.get("retrieved_guidelines", [])
-            st.markdown(f"**Retrieved {len(guidelines)} guideline chunks**")
-            for i, g in enumerate(guidelines[:6], 1):
-                st.markdown(f"**[{i}] Source:** `{g.get('source', 'Unknown')}` — Score: `{g.get('score', 'N/A')}`")
-                st.caption(g.get("content", "")[:300] + "...")
+            st.markdown(f'<div class="terminal-container">', unsafe_allow_html=True)
+            st.markdown(f'<span style="color:#00C853;">[QUERY]</span> Searching vector store for grid balancing protocols...<br>', unsafe_allow_html=True)
+            st.markdown(f'<span style="color:#00C853;">[FOUND]</span> {len(guidelines)} relevant knowledge chunks identified.<br><br>', unsafe_allow_html=True)
+            for g in guidelines[:3]:
+                st.markdown(f'<span style="color:#CBD5E0;">» Source: {g.get("source", "Unknown")}</span><br>', unsafe_allow_html=True)
+                st.markdown(f'<span style="color:#718096;">{g.get("content", "")[:200]}...</span><br><br>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        with st.expander("🧠 Planning Node Output"):
-            plan = result.get("energy_plan", {})
-            if plan:
-                # Grid Balancing Actions
-                actions = plan.get("grid_balancing_actions", [])
-                if actions:
-                    st.markdown("**Grid Balancing Actions:**")
-                    for a in actions:
-                        if isinstance(a, dict):
-                            priority = a.get("priority", "SCHEDULED")
-                            st.markdown(f"- **[{priority}]** {a.get('action_type', 'N/A')}: {a.get('description', '')}")
+        with st.expander("🧠 Planning Node: Strategy Formulation"):
+            p_data = result.get("energy_plan", {})
+            st.markdown(textwrap.dedent(f"""
+            <div class="terminal-container">
+                <span style="color:#F7C948;">[PLANNER]</span> Formulating energy utilization strategy...<br>
+                <span style="color:#F7C948;">[PLANNER]</span> Allocation: {p_data.get('solar_allocation_percent', 0)}% Solar | {p_data.get('storage_usage_percent', 0)}% Storage<br>
+                <span style="color:#F7C948;">[PLANNER]</span> Actions: {len(p_data.get('grid_balancing_actions', []))} grid actions scheduled.<br>
+            </div>
+            """), unsafe_allow_html=True)
 
-                # Storage Schedule
-                storage = plan.get("storage_schedule", [])
-                if storage:
-                    st.markdown("**Storage Schedule:**")
-                    for s in storage:
-                        if isinstance(s, dict):
-                            action = s.get("action", "HOLD")
-                            st.markdown(f"- 🔋 **{action}** → SoC {s.get('target_soc_percent', 'N/A')}% | {s.get('schedule', 'N/A')}")
-
-        with st.expander("📝 Generation Node Output"):
+        with st.expander("📝 Generation Node: Final Synthesis"):
             st.json(report)
 
-        if errors:
-            with st.expander("⚠️ Error Log", expanded=True):
-                for err in errors:
-                    st.error(err)
 
     # ═══════════════════════════════════════════
     # TAB 3: Full Report
     # ═══════════════════════════════════════════
     with tab_report:
-        st.markdown('<p class="section-header">📋 Grid Optimization Report</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-header">Grid Optimization Analysis & Strategy</p>', unsafe_allow_html=True)
+        
+        # ── 1. Forecast Summary Sheet ──
+        with st.container(border=True):
+            st.markdown("#### 1. Statistical Generation Forecast")
+            fs = report.get("forecast_summary", {})
+            if isinstance(fs, dict):
+                fcol1, fcol2, fcol3 = st.columns(3)
+                with fcol1:
+                    st.write(f"**Period:** {fs.get('period', 'N/A')}")
+                    st.write(f"**Confidence:** {fs.get('confidence_level', 0):.1f}%")
+                with fcol2:
+                    st.write(f"**Peak Power:** {fs.get('peak_generation_kwh', 0):.2f} kW")
+                    st.write(f"**Variability Index:** {fs.get('variability_index', 0):.3f}")
+                with fcol3:
+                    st.write(f"**Avg Energy:** {fs.get('avg_generation_kwh', 0):.1f} kWh/day")
+                    st.write(f"**Trend:** {fs.get('trend', 'STABLE')}")
 
-        # ── 1. Forecast Summary ──
-        st.markdown("### 1. Forecast Summary")
-        fs = report.get("forecast_summary", {})
-        if isinstance(fs, dict):
-            fcol1, fcol2, fcol3 = st.columns(3)
-            with fcol1:
-                st.metric("Period", fs.get("period", "N/A"))
-                st.metric("Avg Generation", f"{fs.get('avg_generation_kwh', 0):.1f} kWh/day")
-            with fcol2:
-                st.metric("Peak Generation", f"{fs.get('peak_generation_kwh', 0):.2f} kW")
-                st.metric("Min Generation", f"{fs.get('min_generation_kwh', 0):.2f} kW")
-            with fcol3:
-                st.metric("Variability Index", f"{fs.get('variability_index', 0):.4f}")
-                st.metric("Trend", fs.get("trend", "N/A"))
+        st.markdown('<div style="height: 1.5rem;"></div>', unsafe_allow_html=True)
 
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
+        # ── 2. Risk & Impact ──
+        with st.container(border=True):
+            st.markdown("#### 2. Risk Assessment & Interaction Matrix")
+            ra = report.get("risk_analysis", {})
+            if isinstance(ra, dict):
+                st.markdown(f"**Risk Level:** {render_risk_badge(ra.get('risk_level', 'MEDIUM'))}", unsafe_allow_html=True)
+                
+                rcol1, rcol2 = st.columns(2)
+                with rcol1:
+                    st.markdown("**Core Risk Factors:**")
+                    for factor in ra.get("factors", []):
+                        st.markdown(f"  - ⚠️ {factor}")
+                with rcol2:
+                    st.markdown("**Mitigation Directives:**")
+                    for strategy in ra.get("mitigation_strategies", []):
+                        st.markdown(f"  - ✅ {strategy}")
+                
+                st.markdown(f"**Impact Assessment:** {ra.get('impact_assessment', 'N/A')}")
 
-        # ── 2. Risk Analysis ──
-        st.markdown("### 2. Risk Analysis")
-        ra = report.get("risk_analysis", {})
-        if isinstance(ra, dict):
-            st.markdown(f"**Risk Level:** {render_risk_badge(ra.get('risk_level', 'N/A'))}", unsafe_allow_html=True)
+        st.markdown('<div style="height: 1.5rem;"></div>', unsafe_allow_html=True)
 
-            st.markdown("**Factors:**")
-            for f in ra.get("factors", []):
-                st.markdown(f"- ⚠️ {f}")
-
-            st.markdown("**Mitigation Strategies:**")
-            for m in ra.get("mitigation_strategies", []):
-                st.markdown(f"- ✅ {m}")
-
-            impact = ra.get("impact_assessment", "")
-            if impact:
-                st.info(f"**Impact Assessment:** {impact}")
-
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
-
-        # ── 3. Grid Balancing Actions ──
-        st.markdown("### 3. Grid Balancing Actions")
-        gba = report.get("grid_balancing_actions", [])
-        if gba:
+        # ── 3. Strategic Actions ──
+        with st.container(border=True):
+            st.markdown("#### 3. Execution Protocols")
+            
+            # Grid Actions
+            st.markdown("**Grid Balancing Protocols**")
+            gba = report.get("grid_balancing_actions", [])
             for action in gba:
                 if isinstance(action, dict):
                     priority = action.get("priority", "SCHEDULED")
-                    priority_colors = {
-                        "IMMEDIATE": "🔴", "SCHEDULED": "🟡", "ADVISORY": "🟢"
-                    }
-                    icon = priority_colors.get(priority, "🟡")
-                    st.markdown(f"""
-                    {icon} **{action.get('action_type', 'N/A')}** `[{priority}]`
-                    - {action.get('description', 'N/A')}
-                    - **Impact:** {action.get('expected_impact', 'N/A')}
-                    - **Timeframe:** {action.get('timeframe', 'N/A')}
-                    """)
+                    icon = "🔴" if priority == "IMMEDIATE" else "🟡" if priority == "SCHEDULED" else "🟢"
+                    st.info(f"{icon} **{action.get('action_type', 'N/A')}** | *{action.get('timeframe', 'N/A')}*\n\n{action.get('description', 'N/A')}")
 
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
-
-        # ── 4. Storage Recommendations ──
-        st.markdown("### 4. Storage Recommendations (Charging/Discharging)")
-        sr = report.get("storage_recommendations", [])
-        if sr:
+            # Storage Actions
+            st.markdown("**Battery Storage Prescriptions**")
+            sr = report.get("storage_recommendations", [])
             for rec in sr:
                 if isinstance(rec, dict):
                     action = rec.get("action", "HOLD")
-                    action_icons = {"CHARGE": "🔋⬆️", "DISCHARGE": "🔋⬇️", "HOLD": "🔋⏸️"}
-                    icon = action_icons.get(action, "🔋")
+                    st.success(f"🔋 **{action}** | Target SoC: **{rec.get('target_soc_percent', 0)}%**\n\n{rec.get('reasoning', 'N/A')}")
 
-                    st.markdown(f"""
-                    {icon} **{action}** — Target SoC: **{rec.get('target_soc_percent', 'N/A')}%** | Priority: **{rec.get('priority', 'N/A')}**
-                    - **Schedule:** {rec.get('schedule', 'N/A')}
-                    - **Reasoning:** {rec.get('reasoning', 'N/A')}
-                    """)
+        st.markdown('<div style="height: 1.5rem;"></div>', unsafe_allow_html=True)
 
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
+        # ── 4. Energy Plan ──
+        with st.container(border=True):
+            st.markdown("#### 4. Energy Allocation Plan")
+            eup = report.get("energy_utilization_plan", {})
+            if isinstance(eup, dict):
+                ec1, ec2, ec3 = st.columns(3)
+                ec1.metric("Solar Focus", f"{eup.get('solar_allocation_percent', 0):.0f}%")
+                ec2.metric("Grid Offset", f"{eup.get('grid_import_percent', 0):.0f}%")
+                ec3.metric("Storage Use", f"{eup.get('storage_usage_percent', 0):.0f}%")
+                
+                st.markdown(f"**Demand Response Actions:** {', '.join(eup.get('demand_response_actions', ['None']))}")
+                st.markdown(f"**Optimization Intelligence:** {eup.get('optimization_notes', 'N/A')}")
 
-        # ── 5. Energy Utilization Plan ──
-        st.markdown("### 5. Energy Utilization Plan")
-        eup = report.get("energy_utilization_plan", {})
-        if isinstance(eup, dict):
-            ecol1, ecol2, ecol3 = st.columns(3)
-            with ecol1:
-                st.metric("☀️ Solar", f"{eup.get('solar_allocation_percent', 0):.1f}%")
-            with ecol2:
-                st.metric("🔌 Grid Import", f"{eup.get('grid_import_percent', 0):.1f}%")
-            with ecol3:
-                st.metric("🔋 Storage", f"{eup.get('storage_usage_percent', 0):.1f}%")
+        st.markdown('<div style="height: 2rem;"></div>', unsafe_allow_html=True)
 
-            dr_actions = eup.get("demand_response_actions", [])
-            if dr_actions:
-                st.markdown("**Demand Response Actions:**")
-                for action in dr_actions:
-                    st.markdown(f"- {action}")
-
-            notes = eup.get("optimization_notes", "")
-            if notes:
-                st.success(f"💡 **Optimization Notes:** {notes}")
-
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
-
-        # ── 6. References ──
-        st.markdown("### 6. References")
-        refs = report.get("references", [])
-        if refs:
-            for i, ref in enumerate(refs, 1):
-                st.markdown(f"[{i}] 📄 `{ref}`")
-        else:
-            st.caption("No references cited.")
-
-        st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
-
-        # ── Download Buttons ──
-        dcol1, dcol2 = st.columns(2)
-        with dcol1:
+        # ── Download Section ──
+        d_col1, d_col2 = st.columns(2)
+        with d_col1:
             st.download_button(
-                "📥 Download Report (JSON)",
+                "📥 Export Strategy Report (JSON)",
                 json.dumps(report, indent=2, default=str),
-                file_name=f"solar_grid_report_{datetime.now().strftime('%Y%m%d_%H%M')}.json",
+                file_name=f"Strategy_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.json",
                 mime="application/json",
                 use_container_width=True,
             )
-        with dcol2:
-            # Generate a text version
-            report_text = f"""SOLAR GRID OPTIMIZATION REPORT
-Generated: {report.get('generated_at', 'N/A')}
-Agent Version: {report.get('agent_version', '1.0.0')}
-
-{'='*60}
-
-1. FORECAST SUMMARY
-{json.dumps(report.get('forecast_summary', {}), indent=2, default=str)}
-
-2. RISK ANALYSIS
-{json.dumps(report.get('risk_analysis', {}), indent=2, default=str)}
-
-3. GRID BALANCING ACTIONS
-{json.dumps(report.get('grid_balancing_actions', []), indent=2, default=str)}
-
-4. STORAGE RECOMMENDATIONS
-{json.dumps(report.get('storage_recommendations', []), indent=2, default=str)}
-
-5. ENERGY UTILIZATION PLAN
-{json.dumps(report.get('energy_utilization_plan', {}), indent=2, default=str)}
-
-6. REFERENCES
-{chr(10).join(report.get('references', []))}
-"""
+        with d_col2:
+            report_text = f"SOLAR GRID OPTIMIZATION STRATEGY\n{'-'*30}\n"
+            report_text += f"Generated: {report.get('generated_at', 'N/A')}\n\n"
+            report_text += f"1. FORECAST: {json.dumps(report.get('forecast_summary', {}), indent=2)}\n\n"
+            report_text += f"2. RISK: {json.dumps(report.get('risk_analysis', {}), indent=2)}\n"
             st.download_button(
-                "📥 Download Report (TXT)",
+                "📥 Export Strategy Report (TXT)",
                 report_text,
-                file_name=f"solar_grid_report_{datetime.now().strftime('%Y%m%d_%H%M')}.txt",
+                file_name=f"Strategy_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.txt",
                 mime="text/plain",
                 use_container_width=True,
             )
+
 
     # ═══════════════════════════════════════════
     # TAB 4: RAG Sources
     # ═══════════════════════════════════════════
     with tab_rag:
-        st.markdown('<p class="section-header">📚 RAG-Retrieved Grid Guidelines</p>', unsafe_allow_html=True)
-
+        st.markdown('<p class="section-header">Retrieved Grid Protocol Documents</p>', unsafe_allow_html=True)
+        
         guidelines = result.get("retrieved_guidelines", [])
-
         if guidelines:
-            st.markdown(f"**Total chunks retrieved:** {len(guidelines)}")
-            st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
-
+            st.markdown(f"**Semantic Search Engine found {len(guidelines)} highly relevant advisory chunks.**")
             for i, g in enumerate(guidelines, 1):
                 source = g.get("source", "Unknown")
-                score = g.get("score", 0)
-                content = g.get("content", "N/A")
-
-                # Color based on relevance score (lower = better for FAISS L2)
-                if score < 0.8:
-                    relevance = "🟢 High Relevance"
-                elif score < 1.2:
-                    relevance = "🟡 Medium Relevance"
-                else:
-                    relevance = "🔴 Low Relevance"
-
-                with st.expander(f"[{i}] {source} — {relevance} (Score: {score:.4f})"):
-                    st.markdown(content)
+                score = float(g.get("score", 0))
+                
+                # High-fidelity badge within expander
+                relevance = "🟢 High" if score < 0.8 else "🟡 Medium" if score < 1.2 else "🔴 Low"
+                
+                with st.expander(f"CHUNK {i} | {source} | {relevance} Relevance"):
+                    st.markdown(textwrap.dedent(f"""
+                    <div style="background:rgba(255,107,53,0.02); padding:1rem; border-left: 3px solid #FF6B35; border-radius:4px;">
+                        {g.get('content', 'N/A')}
+                    </div>
+                    <div style="margin-top:1rem; font-size: 0.8rem; color:#718096;">
+                        Vector L2 Distance: {score:.4f}
+                    </div>
+                    """), unsafe_allow_html=True)
         else:
-            st.info("No RAG sources retrieved. Run the pipeline to see retrieved guidelines.")
+            st.warning("Knowledge base not accessed yet.")
+
 
 else:
-    # ── Empty State ──
-    st.markdown("---")
-
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("""
-        <div style="text-align: center; padding: 3rem;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">🌞</div>
-            <h2 style="color: #FF6B35;">Ready to Optimize Your Grid</h2>
-            <p style="color: #8B95A5; font-size: 1.1rem; max-width: 500px; margin: 0 auto;">
-                Configure your API key and forecast parameters in the sidebar,
-                then click <strong>Run Grid Optimization Agent</strong> to start
-                the intelligent analysis pipeline.
+    # ── Landing Page (Empty State) ──
+    st.markdown('<div style="height: 2rem;"></div>', unsafe_allow_html=True)
+    
+    with st.container():
+        st.markdown(f"""
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <div style="font-size: 5rem; margin-bottom: 2rem;">☀️</div>
+            <h1 style="font-size: 3rem; font-weight: 800; color: #FFFFFF; margin-bottom: 1rem;">Solar Intelligence Ready</h1>
+            <p style="color: #94A3B8; font-size: 1.2rem; max-width: 650px; margin: 0 auto; line-height: 1.6;">
+                Autonomous energy management at your fingertips. Synchronize generation patterns with grid protocols in real-time.
             </p>
-            <br>
-            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
-                <div style="text-align: center;">
-                    <div style="font-size: 2rem;">📊</div>
-                    <div style="color: #8B95A5; font-size: 0.85rem;">Solar Forecast<br>Analysis</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 2rem;">📚</div>
-                    <div style="color: #8B95A5; font-size: 0.85rem;">RAG-Grounded<br>Guidelines</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 2rem;">🧠</div>
-                    <div style="color: #8B95A5; font-size: 0.85rem;">Agentic<br>Planning</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 2rem;">📋</div>
-                    <div style="color: #8B95A5; font-size: 0.85rem;">Structured<br>Reports</div>
-                </div>
-            </div>
         </div>
         """, unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            with st.container(border=True):
+                st.markdown("### 📊 M1 Forecast")
+                st.markdown("Precision hourly generation predictions using high-fidelity ML models.")
+        with col2:
+            with st.container(border=True):
+                st.markdown("### 📚 RAG Protocol")
+                st.markdown("Grounding all agent decisions in IEEE standards and regulatory docs.")
+        with col3:
+            with st.container(border=True):
+                st.markdown("### 🤖 Agent Nodes")
+                st.markdown("Multi-step LangGraph reasoning chain for grid balancing and storage.")
+
+    st.markdown('<div style="height: 5rem;"></div>', unsafe_allow_html=True)
+    st.info("← **System Idle**: Use the sidebar to configure parameters and click **'Run Grid Optimization Agent'** to begin analysis.")
+

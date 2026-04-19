@@ -6,6 +6,7 @@ and retrieving relevant grid guidelines.
 
 from __future__ import annotations
 
+from typing import Optional
 import logging
 
 from config.settings import TOP_K_RETRIEVAL
@@ -25,7 +26,7 @@ def _get_vectorstore():
     return _vectorstore
 
 
-def retrieve(query: str, k: int | None = None) -> list[dict]:
+def retrieve(query: str, k: Optional[int] = None) -> list[dict]:
     """
     Retrieve relevant documents from the FAISS vector store.
 
@@ -70,7 +71,7 @@ def retrieve(query: str, k: int | None = None) -> list[dict]:
         }]
 
 
-def retrieve_multi_query(queries: list[str], k: int | None = None) -> list[dict]:
+def retrieve_multi_query(queries: list[str], k: Optional[int] = None) -> list[dict]:
     """
     Retrieve documents using multiple queries and deduplicate results.
 

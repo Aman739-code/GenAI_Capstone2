@@ -21,10 +21,12 @@ from config.settings import (
     VECTORSTORE_DIR,
 )
 
+from typing import Optional
+
 logger = logging.getLogger(__name__)
 
 
-def _load_documents(docs_dir: Path | None = None) -> list:
+def _load_documents(docs_dir: Optional[Path] = None) -> list:
     """Load all markdown documents from the documents directory."""
     docs_dir = docs_dir or DOCUMENTS_DIR
 

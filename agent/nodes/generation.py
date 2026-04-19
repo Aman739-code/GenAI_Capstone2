@@ -52,7 +52,7 @@ def _build_generation_prompt(state: AgentState) -> str:
 - System Capacity: {metadata.get('system_capacity_kw', 'N/A')} kW
 - Forecast Period: {metadata.get('forecast_start', 'N/A')} to {metadata.get('forecast_end', 'N/A')}
 - Model Type: {metadata.get('model_type', 'N/A')}
-- Model R²: {forecast_data.get('model_metrics', {}).get('r2_score', 'N/A')}
+- Model R-Squared: {forecast_data.get('model_metrics', {}).get('r2_score', 'N/A')}
 
 ### Analysis
 {analysis[:1200]}

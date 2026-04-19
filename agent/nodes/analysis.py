@@ -191,7 +191,7 @@ def analysis_node(state: AgentState) -> dict:
 - Daily Mean Generation: {stats.get('daily_mean_kwh', 'N/A')} kWh
 - Average Cloud Cover: {stats.get('avg_cloud_cover', 'N/A')}
 - High Cloud Hours: {stats.get('high_cloud_hours', 'N/A')} / {stats.get('generation_hours', 'N/A')} daylight hours
-- Model R² Score: {forecast_data.get('model_metrics', {}).get('r2_score', 'N/A')}
+- Model R-Squared: {forecast_data.get('model_metrics', {}).get('r2_score', 'N/A')}
 
 ## Risk Level: {risk_level}
 ## Risk Factors: {'; '.join(risk_factors)}
@@ -251,5 +251,5 @@ The coefficient of variation stands at {stats['cov']}, indicating {'high' if sta
 {chr(10).join(f'- {rf}' for rf in risk_factors)}
 
 ### Model Confidence
-The underlying forecast model achieved an R² of {forecast_data.get('model_metrics', {}).get('r2_score', 'N/A')}, RMSE of {forecast_data.get('model_metrics', {}).get('rmse', 'N/A')}, and MAE of {forecast_data.get('model_metrics', {}).get('mae', 'N/A')}.
+The underlying forecast model achieved an R-Squared of {forecast_data.get('model_metrics', {}).get('r2_score', 'N/A')}, RMSE of {forecast_data.get('model_metrics', {}).get('rmse', 'N/A')}, and MAE of {forecast_data.get('model_metrics', {}).get('mae', 'N/A')}.
 """
