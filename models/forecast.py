@@ -14,6 +14,9 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn.utils.parallel")
 
 
 def _generate_synthetic_solar_data(days: int = 90) -> pd.DataFrame:
