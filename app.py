@@ -134,7 +134,9 @@ UI_CSS = """
     [data-testid="stSidebar"] > div:first-child > button { display: none !important; }
     .stSidebar [data-testid="baseButton-header"] { display: none !important; }
     [data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] { display: none !important; }
-
+    [data-testid="stSidebarCollapseButton"] { display: none !important; pointer-events: none !important; }
+    button[aria-label="Collapse sidebar"] { display: none !important; pointer-events: none !important; }
+    [data-testid="stSidebarResizer"] { display: none !important; pointer-events: none !important; }
     /* Section headers */
     .section-header {
         color: #FF6B35;
