@@ -128,9 +128,58 @@ UI_CSS = """
     /* Hide redundant Streamlit UI */
     #MainMenu, footer, header, .stDeployButton { visibility: hidden; display: none !important; }
 
-    /* Hide sidebar close button */
-    button[kind="secondary"] svg { display: none; }
-    .stSidebarCollapsedControl { display: none !important; }
+    /* Hide sidebar close/collapse button — sidebar must always stay open */
+    [data-testid="collapsedControl"] { display: none !important; }
+    button[kind="header"] { display: none !important; }
+    [data-testid="stSidebar"] > div:first-child > button { display: none !important; }
+    .stSidebar [data-testid="baseButton-header"] { display: none !important; }
+    [data-testid="stSidebar"] [data-testid="stSidebarCollapseButton"] { display: none !important; }
+
+    /* Section headers */
+    .section-header {
+        color: #FF6B35;
+        font-weight: 600;
+        font-size: 1.3rem;
+        border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Storage action badges */
+    .action-charge { background: linear-gradient(135deg, #4CAF50, #66BB6A); }
+    .action-discharge { background: linear-gradient(135deg, #FF6B35, #FF8C42); }
+    .action-hold { background: linear-gradient(135deg, #607D8B, #78909C); }
+
+    .action-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    /* Divider */
+    .custom-divider {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.3), transparent);
+        margin: 1.5rem 0;
+    }
+
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
+        padding: 8px 20px;
+    }
 </style>
 """
 
