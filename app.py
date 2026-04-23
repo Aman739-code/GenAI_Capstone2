@@ -1,5 +1,5 @@
 """
-🌞 Solar Grid Optimization Agent — Streamlit UI
+Solar Grid Optimization Agent — Streamlit UI
 Professional dashboard for the Intelligent Solar Energy Forecasting
 & Agentic Grid Optimization system.
 """
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # ─── Page Configuration ───
 st.set_page_config(
     page_title="Solar Grid Optimization Agent",
-    page_icon="🌞",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -343,7 +343,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-logo">SolarAgent.ai</div>', unsafe_allow_html=True)
     
     # API Key
-    st.markdown("#### 🔑 API Configuration")
+    st.markdown("#### API Configuration")
     api_key_input = st.text_input(
         "Google API Key",
         type="password",
@@ -356,26 +356,26 @@ with st.sidebar:
 
     api_status = get_api_key()
     if api_status:
-        st.success("✅ API Key configured")
+        st.success("API Key configured")
     else:
-        st.warning("⚠️ No API key. System will use statistical fallbacks.")
+        st.warning("No API key. System will use statistical fallbacks.")
 
     st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
     # Forecast Parameters
-    st.markdown("#### 📊 Forecast Parameters")
+    st.markdown("#### Forecast Parameters")
     forecast_days = st.slider("Forecast Days", 1, 14, 7, help="Number of days to forecast")
 
     st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
     # Custom Data Upload
-    st.markdown("#### 📂 Custom Dataset")
+    st.markdown("#### Custom Dataset")
     from models.forecast import save_sample_data
     try:
         sample_csv_path = save_sample_data()
         with open(sample_csv_path, "rb") as f:
             st.download_button(
-                "📥 Download Sample CSV",
+                "Download Sample CSV",
                 f,
                 file_name="solar_irradiance_sample.csv",
                 mime="text/csv",
@@ -389,9 +389,9 @@ with st.sidebar:
     st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
     # Run Agent
-    st.markdown("#### 🚀 Execute Pipeline")
+    st.markdown("#### Execute Pipeline")
     run_clicked = st.button(
-        "⚡ Run Grid Optimization Agent",
+        "Run Grid Optimization Agent",
         type="primary",
         use_container_width=True,
     )
@@ -399,17 +399,17 @@ with st.sidebar:
     st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
     # System Info
-    st.markdown("#### ℹ️ System Info")
-    st.caption(f"🕐 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    st.caption("🔧 Agent v1.0.0")
-    st.caption("🧠 LangGraph Multi-Node Pipeline")
-    st.caption("📚 FAISS RAG (4 knowledge bases)")
+    st.markdown("#### System Info")
+    st.caption(f"{datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    st.caption("Agent v1.0.0")
+    st.caption("LangGraph Multi-Node Pipeline")
+    st.caption("FAISS RAG (4 knowledge bases)")
 
 
 # ─── Header ───
 
 # ─── Header ───
-st.title("🌞 Solar Grid Optimization Agent")
+st.title("Solar Grid Optimization Agent")
 st.markdown('<p style="color:#718096; font-size:1.1rem; margin-top:-1rem;">Intelligent Renewable Energy Forecasting & Grid Management</p>', unsafe_allow_html=True)
 st.markdown('<div style="height: 1px; background: rgba(255,255,255,0.05); margin: 1.5rem 0;"></div>', unsafe_allow_html=True)
 
@@ -427,14 +427,14 @@ if run_clicked:
             st.stop()
 
     # ── Step 1: Generate Forecast ──
-    with st.status("⚡ Agent Pipeline Running...", expanded=True) as status:
+    with st.status("Agent Pipeline Running...", expanded=True) as status:
 
-        st.write("📊 **Step 1/5:** Generating Milestone 1 solar forecast...")
+        st.write("**Step 1/5:** Generating Milestone 1 solar forecast...")
         progress = st.progress(0)
         try:
             forecast_data = generate_forecast(days=forecast_days, custom_df=custom_df)
         except Exception as e:
-            status.update(label="❌ Pipeline Error", state="error")
+            status.update(label="Pipeline Error", state="error")
             st.error(f"Forecast Error: {e}")
             st.stop()
         progress.progress(20)
@@ -442,7 +442,7 @@ if run_clicked:
         time.sleep(0.3)
 
         # ── Step 2: Build FAISS Index ──
-        st.write("📚 **Step 2/5:** Building FAISS vector store...")
+        st.write("**Step 2/5:** Building FAISS vector store...")
         try:
             from rag.ingest import build_vectorstore
             build_vectorstore()
@@ -452,8 +452,8 @@ if run_clicked:
         time.sleep(0.3)
 
         # ── Step 3: Run Agent Pipeline ──
-        st.write("🤖 **Step 3/5:** Running LangGraph agent pipeline...")
-        st.write("  → 🔍 Analysis Node → 📚 RAG Retrieval → 🧠 Planning → 📝 Generation")
+        st.write("**Step 3/5:** Running LangGraph agent pipeline...")
+        st.write("  Analysis Node > RAG Retrieval > Planning > Generation")
         progress.progress(50)
 
         result = run_pipeline(forecast_data)
@@ -462,7 +462,7 @@ if run_clicked:
         time.sleep(0.3)
 
         # ── Step 4: Validate Report ──
-        st.write("✅ **Step 4/5:** Validating structured report...")
+        st.write("**Step 4/5:** Validating structured report...")
         from utils.error_handling import validate_report_grounding
         report = result.get("final_report", {})
         guidelines = result.get("retrieved_guidelines", [])
@@ -472,14 +472,14 @@ if run_clicked:
         time.sleep(0.3)
 
         # ── Step 5: Complete ──
-        st.write("🎉 **Step 5/5:** Pipeline complete!")
+        st.write("**Step 5/5:** Pipeline complete!")
         progress.progress(100)
 
         errors = result.get("error_log", [])
         if errors:
-            status.update(label="⚡ Pipeline Complete (with warnings)", state="complete")
+            status.update(label="Pipeline Complete (with warnings)", state="complete")
         else:
-            status.update(label="✅ Pipeline Complete — Report Ready", state="complete")
+            status.update(label="Pipeline Complete — Report Ready", state="complete")
 
 
 # ─── Display Results ───
@@ -491,7 +491,7 @@ if "pipeline_result" in st.session_state:
 
     # ── Tabs ──
     tab_dashboard, tab_workflow, tab_report, tab_rag = st.tabs([
-        "📊 Dashboard", "🤖 Agent Workflow", "📋 Full Report", "📚 RAG Sources"
+        "Dashboard", "Agent Workflow", "Full Report", "RAG Sources"
     ])
 
     # ═══════════════════════════════════════════
@@ -515,7 +515,7 @@ if "pipeline_result" in st.session_state:
             st.markdown(render_kpi(render_risk_badge(risk_level), "Risk Profile"), unsafe_allow_html=True)
         with m_col3:
             primary_action = storage_recs[0].get("action", "N/A") if storage_recs else "N/A"
-            st.markdown(render_kpi(f"🔋 {primary_action}", "Storage Mode"), unsafe_allow_html=True)
+            st.markdown(render_kpi(f"{primary_action}", "Storage Mode"), unsafe_allow_html=True)
         with m_col4:
             savings = util_plan.get("expected_cost_saving_percent", 0)
             st.markdown(render_kpi(f"{savings:.0f}%", "Savings Est."), unsafe_allow_html=True)
@@ -589,7 +589,7 @@ if "pipeline_result" in st.session_state:
         # Node-by-node outputs with terminal look
         st.markdown('<p style="color:#A0AEC0; font-size: 0.9rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em;">Agent Logical Reasoning & Execution Logs</p>', unsafe_allow_html=True)
 
-        with st.expander("🔍 Analysis Node: Solar Pattern Recognition", expanded=True):
+        with st.expander("Analysis Node: Solar Pattern Recognition", expanded=True):
             st.markdown(textwrap.dedent(f"""
             <div class="terminal-container">
                 <span style="color:#FF6B35;">[SYSTEM]</span> Analyzing generational variance...<br>
@@ -599,7 +599,7 @@ if "pipeline_result" in st.session_state:
             </div>
             """), unsafe_allow_html=True)
 
-        with st.expander("📚 RAG Node: Regulatory Retrieval"):
+        with st.expander("RAG Node: Regulatory Retrieval"):
             guidelines = result.get("retrieved_guidelines", [])
             st.markdown(f'<div class="terminal-container">', unsafe_allow_html=True)
             st.markdown(f'<span style="color:#00C853;">[QUERY]</span> Searching vector store for grid balancing protocols...<br>', unsafe_allow_html=True)
@@ -609,7 +609,7 @@ if "pipeline_result" in st.session_state:
                 st.markdown(f'<span style="color:#718096;">{g.get("content", "")[:200]}...</span><br><br>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-        with st.expander("🧠 Planning Node: Strategy Formulation"):
+        with st.expander("Planning Node: Strategy Formulation"):
             p_data = result.get("energy_plan", {})
             st.markdown(textwrap.dedent(f"""
             <div class="terminal-container">
@@ -619,7 +619,7 @@ if "pipeline_result" in st.session_state:
             </div>
             """), unsafe_allow_html=True)
 
-        with st.expander("📝 Generation Node: Final Synthesis"):
+        with st.expander("Generation Node: Final Synthesis"):
             st.json(report)
 
 
@@ -658,11 +658,11 @@ if "pipeline_result" in st.session_state:
                 with rcol1:
                     st.markdown("**Core Risk Factors:**")
                     for factor in ra.get("factors", []):
-                        st.markdown(f"  - ⚠️ {factor}")
+                        st.markdown(f"  - {factor}")
                 with rcol2:
                     st.markdown("**Mitigation Directives:**")
                     for strategy in ra.get("mitigation_strategies", []):
-                        st.markdown(f"  - ✅ {strategy}")
+                        st.markdown(f"  - {strategy}")
                 
                 st.markdown(f"**Impact Assessment:** {ra.get('impact_assessment', 'N/A')}")
 
@@ -678,8 +678,7 @@ if "pipeline_result" in st.session_state:
             for action in gba:
                 if isinstance(action, dict):
                     priority = action.get("priority", "SCHEDULED")
-                    icon = "🔴" if priority == "IMMEDIATE" else "🟡" if priority == "SCHEDULED" else "🟢"
-                    st.info(f"{icon} **{action.get('action_type', 'N/A')}** | *{action.get('timeframe', 'N/A')}*\n\n{action.get('description', 'N/A')}")
+                    st.info(f"**{action.get('action_type', 'N/A')}** | *{action.get('timeframe', 'N/A')}*\n\n{action.get('description', 'N/A')}")
 
             # Storage Actions
             st.markdown("**Battery Storage Prescriptions**")
@@ -687,7 +686,7 @@ if "pipeline_result" in st.session_state:
             for rec in sr:
                 if isinstance(rec, dict):
                     action = rec.get("action", "HOLD")
-                    st.success(f"🔋 **{action}** | Target SoC: **{rec.get('target_soc_percent', 0)}%**\n\n{rec.get('reasoning', 'N/A')}")
+                    st.success(f"**{action}** | Target SoC: **{rec.get('target_soc_percent', 0)}%**\n\n{rec.get('reasoning', 'N/A')}")
 
         st.markdown('<div style="height: 1.5rem;"></div>', unsafe_allow_html=True)
 
@@ -710,7 +709,7 @@ if "pipeline_result" in st.session_state:
         d_col1, d_col2 = st.columns(2)
         with d_col1:
             st.download_button(
-                "📥 Export Strategy Report (JSON)",
+                "Export Strategy Report (JSON)",
                 json.dumps(report, indent=2, default=str),
                 file_name=f"Strategy_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.json",
                 mime="application/json",
@@ -722,7 +721,7 @@ if "pipeline_result" in st.session_state:
             report_text += f"1. FORECAST: {json.dumps(report.get('forecast_summary', {}), indent=2)}\n\n"
             report_text += f"2. RISK: {json.dumps(report.get('risk_analysis', {}), indent=2)}\n"
             st.download_button(
-                "📥 Export Strategy Report (TXT)",
+                "Export Strategy Report (TXT)",
                 report_text,
                 file_name=f"Strategy_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.txt",
                 mime="text/plain",
@@ -744,7 +743,7 @@ if "pipeline_result" in st.session_state:
                 score = float(g.get("score", 0))
                 
                 # High-fidelity badge within expander
-                relevance = "🟢 High" if score < 0.8 else "🟡 Medium" if score < 1.2 else "🔴 Low"
+                relevance = "High" if score < 0.8 else "Medium" if score < 1.2 else "Low"
                 
                 with st.expander(f"CHUNK {i} | {source} | {relevance} Relevance"):
                     st.markdown(textwrap.dedent(f"""
@@ -766,7 +765,7 @@ else:
     with st.container():
         st.markdown(f"""
         <div style="text-align: center; margin-bottom: 3rem;">
-            <div style="font-size: 5rem; margin-bottom: 2rem;">☀️</div>
+            <div style="font-size: 5rem; margin-bottom: 2rem;"></div>
             <h1 style="font-size: 3rem; font-weight: 800; color: #FFFFFF; margin-bottom: 1rem;">Solar Intelligence Ready</h1>
             <p style="color: #94A3B8; font-size: 1.2rem; max-width: 650px; margin: 0 auto; line-height: 1.6;">
                 Autonomous energy management at your fingertips. Synchronize generation patterns with grid protocols in real-time.
@@ -777,15 +776,15 @@ else:
         col1, col2, col3 = st.columns(3)
         with col1:
             with st.container(border=True):
-                st.markdown("### 📊 M1 Forecast")
+                st.markdown("### M1 Forecast")
                 st.markdown("Precision hourly generation predictions using high-fidelity ML models.")
         with col2:
             with st.container(border=True):
-                st.markdown("### 📚 RAG Protocol")
+                st.markdown("### RAG Protocol")
                 st.markdown("Grounding all agent decisions in IEEE standards and regulatory docs.")
         with col3:
             with st.container(border=True):
-                st.markdown("### 🤖 Agent Nodes")
+                st.markdown("### Agent Nodes")
                 st.markdown("Multi-step LangGraph reasoning chain for grid balancing and storage.")
 
     st.markdown('<div style="height: 5rem;"></div>', unsafe_allow_html=True)
